@@ -38,3 +38,14 @@ dnf install maven -y
 
 # Python for python projects
 dnf install python3.11 gcc python3-devel -y
+
+# generate public and private keys for eks node group creation.
+
+ssh-keygen -t rsa -b 2048 -f ~/.ssh/eks -N ""
+
+
+sudo -i -u ec2-user bash << EOF
+  aws configure set aws_access_key_id ${aws_access_key_id}
+  aws configure set aws_secret_access_key ${aws_secret_access_key}
+  aws configure set default.region ${aws_region}
+EOF

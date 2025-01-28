@@ -31,7 +31,11 @@ module "jenkins_agent" {
   vpc_security_group_ids = ["sg-0158e0bf4b6d8891e"]
   subnet_id = "subnet-040445d6feffd6516"
   ami = data.aws_ami.ami_info.id
-  user_data = file("jenkins-agent.sh")
+  user_data = templatefile("jenkins-agent.tpl", {
+    aws_access_key_id     = local.aws_credentials.aws_access_key_id,
+    aws_secret_access_key = local.aws_credentials.aws_secret_access_key,
+    aws_region            = var.aws_region,
+  })
   tags = {
     Name = "jenkins-agent"
   }
