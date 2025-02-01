@@ -7,3 +7,8 @@ variable "zone_name" {
 variable "aws_region" {
   default = "us-east-1"
 }
+
+
+variable "aws_credentials_file" {
+  default     = "~/.ssh/aws_credentials.json"
+}

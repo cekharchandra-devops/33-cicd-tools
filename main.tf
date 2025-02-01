@@ -49,6 +49,42 @@ module "jenkins_agent" {
   ]
 }
 
+resource "local_file" "aws_credentials" {
+  filename = var.aws_credentials_file
+  content  = jsonencode({
+    aws_access_key_id     = local.aws_credentials.aws_access_key_id,
+    aws_secret_access_key = local.aws_credentials.aws_secret_access_key,
+  })
+}
+
+resource "null_resource" "copy_aws_credentials" {
+  provisioner "file" {
+    source      = local_file.aws_credentials.filename
+    destination = "/tmp/aws_credentials.json"
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      password = "DevOps321"
+      host        = module.jenkins_agent.private_ip
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p ~/.ssh",
+      "mv /tmp/aws_credentials.json ~/.ssh/aws_credentials.json",
+      "chmod 600 ~/.ssh/aws_credentials.json"
+    ]
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      # private_key = file(var.ssh_private_key)
+      password    = "DevOps321"
+      host        = module.jenkins_agent.private_ip
+    }
+  }
+}
+
 module "records" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 2.0"
